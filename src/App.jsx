@@ -4,6 +4,7 @@ import { Layout } from './components/Layout';
 import { Modal } from './components/ui/Modal';
 import { Button } from './components/ui/Button';
 import { Plus, Search } from 'lucide-react';
+import { InstallPWA } from './components/InstallPWA';
 
 // Features
 import { ProspeccionCard } from './features/prospecciones/ProspeccionCard';
@@ -214,6 +215,7 @@ const MainApp = () => {
           />
         )}
       </Modal>
+      <InstallPWA />
     </Layout>
   );
 };
