@@ -12,6 +12,7 @@ import { SolicitudCard } from './features/solicitudes/SolicitudCard';
 import { SolicitudForm } from './features/solicitudes/SolicitudForm';
 import { AnalisisCard } from './features/analisis/AnalisisCard';
 import { AnalisisForm } from './features/analisis/AnalisisForm';
+import { ClientesList } from './features/clientes/ClientesList';
 
 // Services
 import { generateAnalisisPDF, generateSolicitudPDF } from './services/pdfService';
@@ -121,6 +122,21 @@ const MainApp = () => {
               <EmptyState title="Sin análisis" desc="Crea uno desde el módulo de solicitudes" />
             )}
           </>
+        )}
+
+        {activeTab === 'clientes' && (
+          <ClientesList 
+            onEdit={(client) => {
+              // Redirect to the appropriate form based on stage
+              if (client.stage === 'analisis') {
+                openModal('analisis', client.analisis);
+              } else if (client.stage === 'solicitud') {
+                openModal('solicitud', client.solicitud);
+              } else {
+                openModal('prospeccion', client);
+              }
+            }} 
+          />
         )}
       </div>
 

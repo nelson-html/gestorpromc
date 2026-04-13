@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDatabase } from '../context/DatabaseContext';
-import { Users, FileText, BarChart3 } from 'lucide-react';
+import { Users, FileText, BarChart3, UserCheck } from 'lucide-react';
 
 export const Layout = ({ children, activeTab, onTabChange }) => {
   const { stats } = useDatabase();
@@ -9,6 +9,7 @@ export const Layout = ({ children, activeTab, onTabChange }) => {
     { id: 'prospecciones', label: 'Prospecciones', icon: Users, count: stats.prospecciones },
     { id: 'solicitudes', label: 'Solicitudes', icon: FileText, count: stats.solicitudes },
     { id: 'analisis', label: 'Análisis', icon: BarChart3, count: stats.analisis },
+    { id: 'clientes', label: 'Clientes', icon: UserCheck, count: stats.clientes },
   ];
 
   return (

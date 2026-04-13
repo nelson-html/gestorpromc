@@ -35,24 +35,26 @@ export const DatabaseProvider = ({ children }) => {
   const saveProspeccion = useCallback((data) => {
     setProspecciones(prev => {
       const idx = prev.findIndex(p => p.id === data.id);
+      const now = new Date().toISOString();
       if (idx >= 0) {
         const next = [...prev];
-        next[idx] = { ...data, updatedAt: new Date().toISOString() };
+        next[idx] = { ...data, updatedAt: now };
         return next;
       }
-      return [...prev, { ...data, createdAt: new Date().toISOString() }];
+      return [...prev, { ...data, createdAt: now, updatedAt: now }];
     });
   }, []);
 
   const saveSolicitud = useCallback((data) => {
     setSolicitudes(prev => {
       const idx = prev.findIndex(s => s.id === data.id);
+      const now = new Date().toISOString();
       if (idx >= 0) {
         const next = [...prev];
-        next[idx] = { ...data, updatedAt: new Date().toISOString() };
+        next[idx] = { ...data, updatedAt: now };
         return next;
       }
-      return [...prev, { ...data, createdAt: new Date().toISOString() }];
+      return [...prev, { ...data, createdAt: now, updatedAt: now }];
     });
     
     // Auto-update prospect status if it's new
@@ -66,12 +68,13 @@ export const DatabaseProvider = ({ children }) => {
   const saveAnalisis = useCallback((data) => {
     setAnalisis(prev => {
       const idx = prev.findIndex(a => a.id === data.id);
+      const now = new Date().toISOString();
       if (idx >= 0) {
         const next = [...prev];
-        next[idx] = { ...data, updatedAt: new Date().toISOString() };
+        next[idx] = { ...data, updatedAt: now };
         return next;
       }
-      return [...prev, { ...data, createdAt: new Date().toISOString() }];
+      return [...prev, { ...data, createdAt: now, updatedAt: now }];
     });
   }, []);
 
@@ -96,7 +99,8 @@ export const DatabaseProvider = ({ children }) => {
     stats: {
       prospecciones: prospecciones.length,
       solicitudes: solicitudes.length,
-      analisis: analisis.length
+      analisis: analisis.length,
+      clientes: prospecciones.length
     }
   };
 
