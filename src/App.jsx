@@ -21,6 +21,7 @@ import { generateFullClientPDF, generateAnalisisPDF, generateSolicitudPDF } from
 const MainApp = () => {
   const [activeTab, setActiveTab] = useState('prospecciones');
   const [search, setSearch] = useState('');
+  const [sortOrder, setSortOrder] = useState('recent'); // 'recent' or 'old'
   const [modal, setModal] = useState({ isOpen: false, type: '', data: null });
   
   const { 
@@ -36,37 +37,60 @@ const MainApp = () => {
     setModal({ isOpen: false, type: '', data: null });
   };
 
-  const filteredProspecciones = prospecciones.filter(p => 
+  const sortData = (data) => {
+    return [...data].sort((a, b) => {
+      const dateA = new Date(a.updatedAt || a.createdAt || 0);
+      const dateB = new Date(b.updatedAt || b.createdAt || 0);
+      return sortOrder === 'recent' ? dateB - dateA : dateA - dateB;
+    });
+  };
+
+  const filteredProspecciones = sortData(prospecciones.filter(p => 
     p.nombre?.toLowerCase().includes(search.toLowerCase()) ||
+    p.telefono?.toLowerCase().includes(search.toLowerCase()) ||
     p.lugar?.toLowerCase().includes(search.toLowerCase())
-  );
+  ));
 
-  const filteredSolicitudes = solicitudes.filter(s => 
+  const filteredSolicitudes = sortData(solicitudes.filter(s => 
     s.nombre?.toLowerCase().includes(search.toLowerCase()) ||
-    s.nombreNegocio?.toLowerCase().includes(search.toLowerCase())
-  );
+    s.nombreNegocio?.toLowerCase().includes(search.toLowerCase()) ||
+    s.telefono?.toLowerCase().includes(search.toLowerCase())
+  ));
 
-  const filteredAnalisis = analisis.filter(a => {
-    const sol = solicitudes.find(s => s.id === a.solicitudId);
-    return sol?.nombre?.toLowerCase().includes(search.toLowerCase());
-  });
+  const filteredAnalisis = sortData(analisis.filter(a => {
+    const sol = solicitudes.find(s => String(s.id) === String(a.solicitudId));
+    if (!search) return true;
+    return sol?.nombre?.toLowerCase().includes(search.toLowerCase()) ||
+           sol?.nombreNegocio?.toLowerCase().includes(search.toLowerCase());
+  }));
 
   return (
     <Layout activeTab={activeTab} onTabChange={setActiveTab}>
-      {/* Search Bar */}
-      <div className="relative mb-6">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-        <input 
-          type="text" 
-          placeholder={`Buscar en ${activeTab}...`}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-12 pr-4 py-3 bg-white rounded-2xl border border-gray-100 shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
-        />
+      {/* Search and Sort Bar */}
+      <div className="flex gap-4 mb-6">
+        <div className="relative flex-1">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <input 
+            type="text" 
+            placeholder={`Buscar en ${activeTab}...`}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-12 pr-4 py-3 bg-white rounded-2xl border border-gray-100 shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+          />
+        </div>
+        {activeTab !== 'clientes' && (
+          <button 
+            onClick={() => setSortOrder(prev => prev === 'recent' ? 'old' : 'recent')}
+            className="px-4 bg-white border border-gray-100 rounded-2xl text-[10px] font-bold text-blue-900 shadow-sm hover:bg-gray-50 transition-all flex flex-col justify-center items-center"
+          >
+            ORDENAR
+            <span className="text-gray-400 text-[8px]">{sortOrder === 'recent' ? 'RECIENTE' : 'ANTIGUO'}</span>
+          </button>
+        )}
       </div>
 
       {/* Lists */}
-      <div className="animate-in fade-in duration-500">
+      <div className={search ? "" : "animate-in fade-in duration-500"}>
         {activeTab === 'prospecciones' && (
           <>
             {filteredProspecciones.length > 0 ? (
@@ -114,7 +138,7 @@ const MainApp = () => {
                 <AnalisisCard 
                   key={a.id} 
                   data={a} 
-                  solicitud={solicitudes.find(s => s.id === a.solicitudId)}
+                  solicitud={solicitudes.find(s => String(s.id) === String(a.solicitudId))}
                   onClick={() => openModal('analisis', a)}
                   onDownload={() => generateAnalisisPDF(a, solicitudes.find(s => s.id === a.solicitudId))}
                 />
@@ -127,6 +151,7 @@ const MainApp = () => {
 
         {activeTab === 'clientes' && (
           <ClientesList 
+            search={search}
             onEdit={(client) => {
               // Redirect to the appropriate form based on stage
               if (client.stage === 'analisis') {

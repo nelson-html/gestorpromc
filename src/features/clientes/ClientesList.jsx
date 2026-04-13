@@ -3,7 +3,7 @@ import { useDatabase } from '../../context/DatabaseContext';
 import { Search, Filter, ArrowUpDown, Calendar, Phone, MapPin, ClipboardList, CheckCircle2, FileDown } from 'lucide-react';
 import { generateFullClientPDF } from '../../services/pdfService';
 
-export const ClientesList = ({ onEdit }) => {
+export const ClientesList = ({ onEdit, search }) => {
   const { prospecciones, solicitudes, analisis } = useDatabase();
   const [filter, setFilter] = useState('all');
   const [sortOrder, setSortOrder] = useState('desc'); // 'asc' or 'desc'
@@ -39,6 +39,16 @@ export const ClientesList = ({ onEdit }) => {
     
     if (filter !== 'all') {
       data = data.filter(item => item.stage === filter);
+    }
+
+    if (search) {
+      const s = search.toLowerCase();
+      data = data.filter(item => 
+        item.nombre?.toLowerCase().includes(s) ||
+        item.telefono?.toLowerCase().includes(s) ||
+        item.lugar?.toLowerCase().includes(s) ||
+        item.solicitud?.nombreNegocio?.toLowerCase().includes(s)
+      );
     }
 
     data.sort((a, b) => {

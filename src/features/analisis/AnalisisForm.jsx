@@ -50,8 +50,11 @@ export const AnalisisForm = ({ initialData, onAutoSaved, onComplete }) => {
     if (debouncedData.solicitudId) {
       saveAnalisis(debouncedData);
       if (onAutoSaved) onAutoSaved();
+    } else if (initialData?.solicitudId) {
+       // Fallback to initialData if for some reason it's missing in debouncedData
+       saveAnalisis({ ...debouncedData, solicitudId: initialData.solicitudId });
     }
-  }, [debouncedData, saveAnalisis]);
+  }, [debouncedData, saveAnalisis, initialData]);
 
   const totalInventario = useMemo(() => {
     return formData.inventario.reduce((acc, item) => {
