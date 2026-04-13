@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+:root {
+  --primary: #1e3a8a;
+  --primary-light: #3b82f6;
+  --secondary: #059669;
+  --danger: #dc2626;
+  --warning: #d97706;
+}
+
+body {
+  @apply antialiased;
+}
