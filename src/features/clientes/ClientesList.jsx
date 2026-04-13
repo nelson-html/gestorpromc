@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useDatabase } from '../../context/DatabaseContext';
-import { Search, Filter, ArrowUpDown, Calendar, Phone, MapPin, ClipboardList, CheckCircle2 } from 'lucide-react';
+import { Search, Filter, ArrowUpDown, Calendar, Phone, MapPin, ClipboardList, CheckCircle2, FileDown } from 'lucide-react';
+import { generateFullClientPDF } from '../../services/pdfService';
 
 export const ClientesList = ({ onEdit }) => {
   const { prospecciones, solicitudes, analisis } = useDatabase();
@@ -99,7 +100,7 @@ export const ClientesList = ({ onEdit }) => {
               onClick={() => onEdit(item)}
               className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:border-blue-200 transition-all cursor-pointer group relative overflow-hidden"
             >
-              <div className="flex justify-between items-start mb-2">
+              <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center gap-2">
                   <div className={`p-1.5 rounded-lg ${color}`}>
                     <StageIcon size={16} />
@@ -108,9 +109,25 @@ export const ClientesList = ({ onEdit }) => {
                     {label}
                   </span>
                 </div>
-                <span className="text-[10px] text-gray-400 font-medium">
-                  {item.lastUpdate ? new Date(item.lastUpdate).toLocaleDateString() : 'Sin fecha'}
-                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      generateFullClientPDF({
+                        prospeccion: item,
+                        solicitud: item.solicitud,
+                        analisis: item.analisis
+                      });
+                    }}
+                    className="p-2 hover:bg-red-50 text-red-600 rounded-full transition-colors group/btn"
+                    title="Exportar PDF Completo"
+                  >
+                    <FileDown size={18} className="group-hover/btn:scale-110 transition-transform" />
+                  </button>
+                  <span className="text-[10px] text-gray-400 font-medium">
+                    {item.lastUpdate ? new Date(item.lastUpdate).toLocaleDateString() : 'Sin fecha'}
+                  </span>
+                </div>
               </div>
 
               <h3 className="text-base font-bold text-gray-900 group-hover:text-blue-900 transition-colors uppercase">

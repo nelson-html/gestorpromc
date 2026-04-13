@@ -15,7 +15,7 @@ import { AnalisisForm } from './features/analisis/AnalisisForm';
 import { ClientesList } from './features/clientes/ClientesList';
 
 // Services
-import { generateAnalisisPDF, generateSolicitudPDF } from './services/pdfService';
+import { generateFullClientPDF, generateAnalisisPDF, generateSolicitudPDF } from './services/pdfService';
 
 const MainApp = () => {
   const [activeTab, setActiveTab] = useState('prospecciones');
@@ -170,6 +170,17 @@ const MainApp = () => {
               <Button variant="secondary" onClick={closeModal}>Cerrar</Button>
               {modal.type === 'solicitud' && modal.data?.id && (
                 <Button variant="success" onClick={() => generateSolicitudPDF(modal.data)}>PDF</Button>
+              )}
+              {modal.type === 'analisis' && modal.data?.id && (
+                <Button variant="success" onClick={() => {
+                  const sol = solicitudes.find(s => s.id === modal.data.solicitudId);
+                  const pros = prospecciones.find(p => p.id === sol?.prospeccionId);
+                  generateFullClientPDF({
+                    prospeccion: pros || {},
+                    solicitud: sol,
+                    analisis: modal.data
+                  });
+                }}>PDF Completo</Button>
               )}
             </div>
           </div>
